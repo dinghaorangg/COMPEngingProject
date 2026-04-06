@@ -58,25 +58,30 @@ namespace DedicatedServer
 
             while (_running)
             {
-                try
-                {
-                    byte[] data = _udp.Receive(ref remoteEndPoint);
-                    string msg = Encoding.UTF8.GetString(data);
+                byte[] data = _udp.Receive(ref remoteEndPoint);
+                string msg = Encoding.UTF8.GetString(data);
 
-                    HandleMessage(remoteEndPoint, msg);
-                }
-                catch (SocketException)
-                {
-                    if (!_running) break;
-                }
-                catch (ObjectDisposedException)
-                {
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"ReceiveLoop Error: {ex.Message}");
-                }
+                Console.WriteLine($"Received from {remoteEndPoint}: {msg}");
+                Send(remoteEndPoint, "Hello World UDP");
+                // try
+                // {
+                //     byte[] data = _udp.Receive(ref remoteEndPoint);
+                //     string msg = Encoding.UTF8.GetString(data);
+
+                //     HandleMessage(remoteEndPoint, msg);
+                // }
+                // catch (SocketException)
+                // {
+                //     if (!_running) break;
+                // }
+                // catch (ObjectDisposedException)
+                // {
+                //     break;
+                // }
+                // catch (Exception ex)
+                // {
+                //     Console.WriteLine($"ReceiveLoop Error: {ex.Message}");
+                // }
             }
         }
 

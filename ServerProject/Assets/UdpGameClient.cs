@@ -55,25 +55,48 @@ public class UdpGameClient : MonoBehaviour
 
     public void StartClient()
     {
+        UdpClient client = new UdpClient();
         try
         {
-            serverEndPoint = new IPEndPoint(IPAddress.Parse(serverIp), serverPort);
-            udpClient = new UdpClient(0);
-            udpClient.Connect(serverEndPoint);
-
             running = true;
-            lastReceiveTimeUtc = DateTime.UtcNow;
+            byte[] data = Encoding.UTF8.GetBytes("Client: Hello World UDP");
+            client.Send(data, data.Length, serverIp, serverPort);
+            Debug.Log("UDP Msg Sent");
 
-            receiveThread = new Thread(ReceiveLoop);
-            receiveThread.IsBackground = true;
-            receiveThread.Start();
+            client.Client.ReceiveTimeout = 2000;
 
-            Debug.Log("UDP client started.");
+            IPEndPoint remote = new IPEndPoint(IPAddress.Any, 0);
+            byte[] receivedData = client.Receive(ref remote);
+            string response = Encoding.UTF8.GetString(receivedData);
+            Debug.Log("Server replied: " + response);
         }
-        catch (Exception ex)
+        catch (System.Exception e)
         {
-            Debug.LogError($"StartClient Error: {ex.Message}");
+            Debug.LogError("UDP Error:" + e.Message);
         }
+        finally
+        {
+            client.Close();
+        }
+        // try
+        // {
+        //     serverEndPoint = new IPEndPoint(IPAddress.Parse(serverIp), serverPort);
+        //     udpClient = new UdpClient(0);
+        //     udpClient.Connect(serverEndPoint);
+
+        //     running = true;
+        //     lastReceiveTimeUtc = DateTime.UtcNow;
+
+        //     receiveThread = new Thread(ReceiveLoop);
+        //     receiveThread.IsBackground = true;
+        //     receiveThread.Start();
+
+        //     Debug.Log("UDP client started.");
+        // }
+        // catch (Exception ex)
+        // {
+        //     Debug.LogError($"StartClient Error: {ex.Message}");
+        // }
     }
 
     public void StopClient()
